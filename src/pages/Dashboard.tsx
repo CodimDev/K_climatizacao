@@ -7,17 +7,16 @@ import Button from '../components/ui/Button'
 import { useTheme } from '../contexts/ThemeContext'
 import { useQuery } from '@tanstack/react-query'
 import moment from 'moment'
-import { base44 } from '../lib/base44'
+import { serviceOrders as soData, transactions as finData, stock as stockData } from '../mock/data'
 import { ClipboardList, DollarSign, Package, Users, AlertTriangle, ArrowUp, Clock } from 'lucide-react'
 
 export default function Dashboard() {
   const { toggle, theme } = useTheme()
-  const soQ = useQuery({ queryKey: ['serviceOrders'], queryFn: () => base44.entities.ServiceOrder.list() })
-  const finQ = useQuery({ queryKey: ['financial'], queryFn: () => base44.entities.Financial.list() })
-  const stockQ = useQuery({ queryKey: ['stock'], queryFn: () => base44.entities.Stock.list() })
-  const clientsQ = useQuery({ queryKey: ['clients'], queryFn: () => base44.entities.Client.list() })
+  const soQ = useQuery({ queryKey: ['serviceOrders'], queryFn: async () => soData })
+  const finQ = useQuery({ queryKey: ['financial'], queryFn: async () => finData })
+  const stockQ = useQuery({ queryKey: ['stock'], queryFn: async () => stockData })
 
-  const loading = soQ.isLoading || finQ.isLoading || stockQ.isLoading || clientsQ.isLoading
+  const loading = soQ.isLoading || finQ.isLoading || stockQ.isLoading
   const serviceOrders = soQ.data ?? []
   const transactions = finQ.data ?? []
   const stock = stockQ.data ?? []
