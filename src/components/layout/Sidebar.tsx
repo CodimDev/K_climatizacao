@@ -34,10 +34,12 @@ export default function Sidebar({ open, onClose }: Props) {
   return (
     <>
       <div className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'} lg:hidden`} onClick={onClose} />
-      <aside className={`fixed left-0 top-0 h-screen w-64 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 transition-transform ${open ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 z-40`}> 
-        <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex items-center gap-2">
-          <UserCircle className="w-6 h-6" />
-          <div className="font-semibold">K Climatização</div>
+      <aside className={`fixed top-0 left-0 z-50 h-full w-64 transform transition-transform duration-300 ease-out bg-background border-r border-border ${open ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}> 
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-md bg-gradient-to-br from-cyan-500 to-cyan-400 shadow-md" />
+            <div className="font-semibold">K-Climatização</div>
+          </div>
         </div>
         <nav className="p-2 space-y-6 overflow-y-auto h-[calc(100vh-64px)]">
           <div className="space-y-1">
@@ -45,10 +47,10 @@ export default function Sidebar({ open, onClose }: Props) {
               const Icon = it.icon
               const active = pathname === it.to
               return (
-                <Link key={it.to} to={it.to} className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${active ? 'bg-cyan-50 text-cyan-700 dark:bg-cyan-900/20 dark:text-cyan-200' : 'hover:bg-gray-100 dark:hover:bg-gray-900'}`}> 
+                <Link key={it.to} to={it.to} className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted ${active ? 'text-primary bg-muted border-l-2 border-l-primary' : ''}`}> 
                   <Icon className="w-4 h-4" />
                   <span className="flex-1">{it.label}</span>
-                  {active && <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />}
+                  {active && <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
                 </Link>
               )
             })}
@@ -58,23 +60,27 @@ export default function Sidebar({ open, onClose }: Props) {
               const Icon = it.icon
               const active = pathname === it.to
               return (
-                <Link key={it.to} to={it.to} className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm ${active ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-200' : 'hover:bg-gray-100 dark:hover:bg-gray-900'}`}> 
+                <Link key={it.to} to={it.to} className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted ${active ? 'text-primary bg-muted border-l-2 border-l-primary' : ''}`}> 
                   <Icon className="w-4 h-4" />
                   <span className="flex-1">{it.label}</span>
-                  {active && <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />}
+                  {active && <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />}
                 </Link>
               )
             })}
           </div>
-          <div className="mt-6 p-3 border-t border-gray-200 dark:border-gray-800">
+          <div className="mt-6 p-4 border-t border-border">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center">
-                <UserCircle className="w-5 h-5" />
+              <div className="w-8 h-8 rounded-full border border-border bg-gradient-to-br from-cyan-500/20 to-cyan-400/20 flex items-center justify-center">
+                <span className="text-xs font-semibold text-cyan-600">OP</span>
               </div>
               <div className="text-sm">
                 <div className="font-medium">Operador</div>
-                <button className="text-xs text-red-600 dark:text-red-400">Sair</button>
+                <div className="text-xs text-muted-foreground">op@empresa.com</div>
               </div>
+              <button className="ml-auto text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md px-2 py-1 flex items-center gap-1">
+                <UserCircle className="w-4 h-4" />
+                Sair
+              </button>
             </div>
           </div>
         </nav>
