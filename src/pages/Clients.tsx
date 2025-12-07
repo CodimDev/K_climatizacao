@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { base44 } from '@/api/base44Client'
+import { clientsDao } from '@/api/dao/clients'
 import { Link } from 'react-router-dom'
 import { createPageUrl } from '@/utils'
 import { format } from 'date-fns'
@@ -17,7 +17,7 @@ import {
   ChevronRight,
   Edit2,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -37,24 +37,36 @@ export default function Clients() {
 
   const { data: clients = [], isLoading } = useQuery({
     queryKey: ['clients'],
-    queryFn: () => base44.entities.Client.list('-created_date', 200),
+    queryFn: () => clientsDao.list('-created_at', 200),
   })
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Client.create(data),
+    mutationFn: (data) => clientsDao.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['clients'])
       setIsDialogOpen(false)
       setEditingClient(null)
+      alert('Cliente salvo com sucesso!')
+    },
+    onError: (error: any) => {
+      console.error('Erro ao salvar cliente:', error)
+      alert(`Erro ao salvar cliente: ${error.message || 'Erro desconhecido'}`)
     },
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Client.update(id, data),
+    mutationFn: ({ id, data }) => clientsDao.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['clients'])
       setIsDialogOpen(false)
       setEditingClient(null)
+      alert('Cliente atualizado com sucesso!')
+    },
+    onError: (error: any) => {
+      console.error('Erro ao atualizar cliente:', error)
+      alert(
+        `Erro ao atualizar cliente: ${error.message || 'Erro desconhecido'}`
+      )
     },
   })
 

@@ -153,8 +153,8 @@ export default function MaintenanceHistory() {
                       order.status === 'concluido'
                         ? 'bg-emerald-500/20 border border-emerald-500/30'
                         : order.status === 'em_execucao'
-                        ? 'bg-amber-500/20 border border-amber-500/30'
-                        : 'bg-cyan-500/20 border border-cyan-500/30'
+                          ? 'bg-amber-500/20 border border-amber-500/30'
+                          : 'bg-cyan-500/20 border border-cyan-500/30'
                     }`}
                   >
                     <Wrench
@@ -162,8 +162,8 @@ export default function MaintenanceHistory() {
                         order.status === 'concluido'
                           ? 'text-emerald-400'
                           : order.status === 'em_execucao'
-                          ? 'text-amber-400'
-                          : 'text-cyan-400'
+                            ? 'text-amber-400'
+                            : 'text-cyan-400'
                       }`}
                     />
                   </div>

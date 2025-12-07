@@ -1,7 +1,8 @@
 // @ts-nocheck
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { base44 } from '@/api/base44Client'
+import { financialDao } from '@/api/dao/financial'
+import { serviceOrdersDao } from '@/api/dao/serviceOrders'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 import {
   DollarSign,
@@ -74,16 +75,16 @@ export default function Financial() {
 
   const { data: transactions = [], isLoading } = useQuery({
     queryKey: ['financials'],
-    queryFn: () => base44.entities.Financial.list('-date', 200),
+    queryFn: () => financialDao.list('-date', 200),
   })
 
   const { data: serviceOrders = [] } = useQuery({
     queryKey: ['service-orders-completed'],
-    queryFn: () => base44.entities.ServiceOrder.filter({ status: 'concluido' }),
+    queryFn: () => serviceOrdersDao.filter({ status: 'concluido' }),
   })
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Financial.create(data),
+    mutationFn: (data) => financialDao.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['financials'])
       setIsDialogOpen(false)
@@ -92,7 +93,7 @@ export default function Financial() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Financial.update(id, data),
+    mutationFn: ({ id, data }) => financialDao.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['financials'])
       setIsDialogOpen(false)
@@ -101,7 +102,7 @@ export default function Financial() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Financial.delete(id),
+    mutationFn: (id) => financialDao.delete(id),
     onSuccess: () => queryClient.invalidateQueries(['financials']),
   })
 
@@ -347,8 +348,8 @@ export default function Financial() {
               {editingTx?.id
                 ? 'Editar Lançamento'
                 : editingTx?.type === 'entrada'
-                ? 'Nova Entrada'
-                : 'Nova Saída'}
+                  ? 'Nova Entrada'
+                  : 'Nova Saída'}
             </DialogTitle>
           </DialogHeader>
 

@@ -1,69 +1,112 @@
-// @ts-nocheck
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { createPageUrl } from '@/utils'
-import { ArrowLeft, Shield, Eye, Edit2, Trash2, Settings } from 'lucide-react'
+import {
+  ArrowLeft,
+  Shield,
+  Eye,
+  Edit2,
+  Trash2,
+  Settings,
+  Loader2,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Switch } from '@/components/ui/switch'
+import { supabase } from '@/api/supabaseClient'
 
 const modules = [
   { key: 'dashboard', label: 'Dashboard' },
   { key: 'appointments', label: 'Agendamentos' },
   { key: 'service_orders', label: 'Ordens de Serviço' },
+  { key: 'clients', label: 'Clientes' },
+  { key: 'equipments', label: 'Equipamentos' },
   { key: 'stock', label: 'Estoque' },
   { key: 'financial', label: 'Financeiro' },
   { key: 'services', label: 'Serviços' },
   { key: 'settings', label: 'Configurações' },
+  { key: 'users', label: 'Usuários' },
 ]
-
-const mockUsers = [
-  { id: 1, name: 'João Técnico', role: 'tecnico' },
-  { id: 2, name: 'Maria Admin', role: 'admin' },
-  { id: 3, name: 'Carlos Técnico', role: 'tecnico' },
-  { id: 4, name: 'Ana Suporte', role: 'admin' },
-]
-
-const defaultPermissions = {
-  tecnico: {
-    dashboard: { view: true, edit: false, delete: false, admin: false },
-    appointments: { view: true, edit: true, delete: false, admin: false },
-    service_orders: { view: true, edit: true, delete: false, admin: false },
-    stock: { view: true, edit: true, delete: false, admin: false },
-    financial: { view: false, edit: false, delete: false, admin: false },
-    services: { view: true, edit: false, delete: false, admin: false },
-    settings: { view: false, edit: false, delete: false, admin: false },
-  },
-  admin: {
-    dashboard: { view: true, edit: true, delete: true, admin: true },
-    appointments: { view: true, edit: true, delete: true, admin: true },
-    service_orders: { view: true, edit: true, delete: true, admin: true },
-    stock: { view: true, edit: true, delete: true, admin: true },
-    financial: { view: true, edit: true, delete: true, admin: true },
-    services: { view: true, edit: true, delete: true, admin: true },
-    settings: { view: true, edit: true, delete: true, admin: true },
-  },
-}
 
 export default function UserPermissions() {
-  const [permissions, setPermissions] = useState(() => {
-    const initial = {}
-    mockUsers.forEach((user) => {
-      initial[user.id] = { ...defaultPermissions[user.role] }
-    })
-    return initial
-  })
+  const [users, setUsers] = useState<any[]>([])
+  const [permissions, setPermissions] = useState<any>({})
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
-  const togglePermission = (userId, module, permission) => {
-    setPermissions((prev) => ({
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+  const fetchUsers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('full_name')
+
+      if (error) throw error
+
+      setUsers(data || [])
+
+      const initialPermissions: any = {}
+      data?.forEach((user) => {
+        initialPermissions[user.id] = user.permissions || {}
+      })
+      setPermissions(initialPermissions)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const togglePermission = (
+    userId: string,
+    module: string,
+    permission: string
+  ) => {
+    setPermissions((prev: any) => ({
       ...prev,
       [userId]: {
         ...prev[userId],
         [module]: {
-          ...prev[userId][module],
-          [permission]: !prev[userId][module][permission],
+          ...(prev[userId]?.[module] || {
+            view: false,
+            edit: false,
+            delete: false,
+            admin: false,
+          }),
+          [permission]: !prev[userId]?.[module]?.[permission],
         },
       },
     }))
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const updates = Object.entries(permissions).map(([userId, userPerms]) =>
+        supabase
+          .from('profiles')
+          .update({ permissions: userPerms })
+          .eq('id', userId)
+      )
+
+      await Promise.all(updates)
+      alert('Permissões salvas com sucesso!')
+    } catch (error) {
+      console.error('Error saving permissions:', error)
+      alert('Erro ao salvar permissões.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-500" />
+      </div>
+    )
   }
 
   return (
@@ -96,7 +139,7 @@ export default function UserPermissions() {
                 <th className="text-left p-4 text-xs font-medium text-white/40">
                   Módulo
                 </th>
-                {mockUsers.map((user) => (
+                {users.map((user) => (
                   <th key={user.id} className="text-center p-4 min-w-[140px]">
                     <div className="flex flex-col items-center gap-1">
                       <div
@@ -106,14 +149,14 @@ export default function UserPermissions() {
                             : 'bg-cyan-500/20 text-cyan-400'
                         }`}
                       >
-                        {user.name
-                          .split(' ')
-                          .map((n) => n[0])
+                        {user.full_name
+                          ?.split(' ')
+                          .map((n: string) => n[0])
                           .join('')
-                          .slice(0, 2)}
+                          .slice(0, 2) || 'U'}
                       </div>
                       <span className="text-xs text-white font-medium">
-                        {user.name.split(' ')[0]}
+                        {user.full_name?.split(' ')[0] || 'Usuário'}
                       </span>
                       <span className="text-[10px] text-white/40">
                         {user.role === 'admin' ? 'Admin' : 'Técnico'}
@@ -136,7 +179,7 @@ export default function UserPermissions() {
                       {module.label}
                     </span>
                   </td>
-                  {mockUsers.map((user) => (
+                  {users.map((user) => (
                     <td key={user.id} className="p-4">
                       <div className="flex flex-wrap justify-center gap-2">
                         <button
@@ -234,8 +277,19 @@ export default function UserPermissions() {
 
       {/* Save */}
       <div className="flex justify-end">
-        <Button className="bg-cyan-500 hover:bg-cyan-400 text-black font-medium">
-          Salvar Permissões
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-cyan-500 hover:bg-cyan-400 text-black font-medium"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Salvando...
+            </>
+          ) : (
+            'Salvar Permissões'
+          )}
         </Button>
       </div>
     </div>

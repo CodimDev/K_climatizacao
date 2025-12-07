@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { base44 } from '@/api/base44Client'
+import { servicesDao } from '@/api/dao/services'
 import {
   Wrench,
   Search,
@@ -77,11 +77,11 @@ export default function Services() {
 
   const { data: services = [], isLoading } = useQuery({
     queryKey: ['services'],
-    queryFn: () => base44.entities.Service.list('name'),
+    queryFn: () => servicesDao.list('name'),
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Service.update(id, data),
+    mutationFn: ({ id, data }) => servicesDao.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['services'])
       setIsDialogOpen(false)
@@ -90,7 +90,7 @@ export default function Services() {
   })
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Service.create(data),
+    mutationFn: (data) => servicesDao.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['services'])
       setIsDialogOpen(false)
@@ -99,7 +99,7 @@ export default function Services() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Service.delete(id),
+    mutationFn: (id) => servicesDao.delete(id),
     onSuccess: () => queryClient.invalidateQueries(['services']),
   })
 

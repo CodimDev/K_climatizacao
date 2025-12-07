@@ -131,6 +131,29 @@ export default function Dashboard() {
   const monthlyGoal = 30
   const progress = Math.round((completedMonth.length / monthlyGoal) * 100)
 
+  const start = new Date(monthStart)
+  const end = new Date(monthEnd)
+  const series: any[] = []
+  for (
+    let d = new Date(start);
+    d <= end;
+    d = new Date(d.getTime() + 86400000)
+  ) {
+    const key = format(d, 'yyyy-MM-dd')
+    const receita = monthFinancials
+      .filter((f) => f.type === 'entrada' && f.date === key)
+      .reduce((sum, f) => sum + (f.amount || 0), 0)
+    const despesa = monthFinancials
+      .filter((f) => f.type === 'saida' && f.date === key)
+      .reduce((sum, f) => sum + (f.amount || 0), 0)
+    series.push({
+      dateLabel: format(d, 'dd/MM'),
+      receita,
+      despesa,
+      saldo: receita - despesa,
+    })
+  }
+
   return (
     <div className="space-y-6">
       {/* KPIs Grid */}
@@ -236,7 +259,12 @@ export default function Dashboard() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Finance chart */}
         <div className="lg:col-span-2">
-          <FinanceChart />
+          <FinanceChart
+            data={series}
+            revenue={monthRevenue}
+            expenses={monthExpenses}
+            balance={balance}
+          />
         </div>
 
         {/* Priority panel */}

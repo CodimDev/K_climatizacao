@@ -14,8 +14,19 @@
     "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@/*": ["src/*"],
+      "@/components/ui/button": ["src/components/ui/button"],
+      "@/components/ui/Button": ["src/components/ui/button"],
+      "@/components/ui/input": ["src/components/ui/input"],
+      "@/components/ui/Input": ["src/components/ui/input"],
+      "@/components/ui/select": ["src/components/ui/select"],
+      "@/components/ui/Select": ["src/components/ui/select"],
+      "@/components/ui/dialog": ["src/components/ui/dialog"],
+      "@/components/ui/Dialog": ["src/components/ui/dialog"],
+      "@/components/ui/dropdown-menu": ["src/components/ui/dropdown-menu"],
+      "@/components/ui/DropdownMenu": ["src/components/ui/dropdown-menu"]
+    },
+    "types": ["vitest", "node"]
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

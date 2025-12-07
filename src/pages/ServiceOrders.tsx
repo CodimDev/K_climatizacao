@@ -1,7 +1,9 @@
 // @ts-nocheck
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { base44 } from '@/api/base44Client'
+import { serviceOrdersDao } from '@/api/dao/serviceOrders'
+import { servicesDao } from '@/api/dao/services'
+import { clientsDao } from '@/api/dao/clients'
 import { Link } from 'react-router-dom'
 import { createPageUrl } from '@/utils'
 import { format } from 'date-fns'
@@ -48,23 +50,23 @@ export default function ServiceOrders() {
 
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['service-orders'],
-    queryFn: () => base44.entities.ServiceOrder.list('-created_date', 200),
+    queryFn: () => serviceOrdersDao.list('-created_at', 200),
   })
 
   const { data: services = [] } = useQuery({
     queryKey: ['services'],
-    queryFn: () => base44.entities.Service.list(),
+    queryFn: () => servicesDao.list(),
   })
 
   const { data: clients = [] } = useQuery({
     queryKey: ['clients'],
-    queryFn: () => base44.entities.Client.list(),
+    queryFn: () => clientsDao.list(),
   })
 
   const createMutation = useMutation({
     mutationFn: async (data) => {
       const orderNumber = `OS-${Date.now().toString().slice(-6)}`
-      return base44.entities.ServiceOrder.create({
+      return serviceOrdersDao.create({
         ...data,
         order_number: orderNumber,
         opened_at: new Date().toISOString(),
@@ -74,6 +76,11 @@ export default function ServiceOrders() {
       queryClient.invalidateQueries(['service-orders'])
       setIsDialogOpen(false)
       setNewOrder(null)
+      alert('Ordem de serviço criada com sucesso!')
+    },
+    onError: (error: any) => {
+      console.error('Erro ao criar OS:', error)
+      alert(`Erro ao criar OS: ${error.message || 'Erro desconhecido'}`)
     },
   })
 

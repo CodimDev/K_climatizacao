@@ -1,7 +1,8 @@
 // @ts-nocheck
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { base44 } from '@/api/base44Client'
+import { appointmentsDao } from '@/api/dao/appointments'
+import { servicesDao } from '@/api/dao/services'
 import { format } from 'date-fns'
 import {
   Calendar,
@@ -54,16 +55,16 @@ export default function Appointments() {
 
   const { data: appointments = [], isLoading } = useQuery({
     queryKey: ['appointments'],
-    queryFn: () => base44.entities.Appointment.list('-date', 200),
+    queryFn: () => appointmentsDao.list('-date', 200),
   })
 
   const { data: services = [] } = useQuery({
     queryKey: ['services'],
-    queryFn: () => base44.entities.Service.list(),
+    queryFn: () => servicesDao.list(),
   })
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Appointment.create(data),
+    mutationFn: (data) => appointmentsDao.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['appointments'])
       setIsDialogOpen(false)
@@ -72,7 +73,7 @@ export default function Appointments() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Appointment.update(id, data),
+    mutationFn: ({ id, data }) => appointmentsDao.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['appointments'])
       setIsDialogOpen(false)

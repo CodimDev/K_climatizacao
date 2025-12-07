@@ -1,7 +1,8 @@
 // @ts-nocheck
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { base44 } from '@/api/base44Client'
+import { stockDao } from '@/api/dao/stock'
+import { stockMovementsDao } from '@/api/dao/stockMovements'
 import { format } from 'date-fns'
 import {
   Package,
@@ -72,16 +73,16 @@ export default function Stock() {
 
   const { data: stockItems = [], isLoading } = useQuery({
     queryKey: ['stocks'],
-    queryFn: () => base44.entities.Stock.list('name'),
+    queryFn: () => stockDao.list('name'),
   })
 
   const { data: movements = [] } = useQuery({
     queryKey: ['stock-movements'],
-    queryFn: () => base44.entities.StockMovement.list('-created_date', 100),
+    queryFn: () => stockMovementsDao.list('-created_date', 100),
   })
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Stock.create(data),
+    mutationFn: (data) => stockDao.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries(['stocks'])
       setIsDialogOpen(false)
@@ -90,7 +91,7 @@ export default function Stock() {
   })
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Stock.update(id, data),
+    mutationFn: ({ id, data }) => stockDao.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['stocks'])
       setIsDialogOpen(false)
@@ -100,12 +101,12 @@ export default function Stock() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Stock.delete(id),
+    mutationFn: (id) => stockDao.delete(id),
     onSuccess: () => queryClient.invalidateQueries(['stocks']),
   })
 
   const movementMutation = useMutation({
-    mutationFn: (data) => base44.entities.StockMovement.create(data),
+    mutationFn: (data) => stockMovementsDao.create(data),
     onSuccess: () => queryClient.invalidateQueries(['stock-movements']),
   })
 
@@ -379,10 +380,10 @@ export default function Stock() {
                       percentage > 100
                         ? 'bg-emerald-500'
                         : percentage > 50
-                        ? 'bg-cyan-500'
-                        : percentage > 0
-                        ? 'bg-amber-500'
-                        : 'bg-red-500'
+                          ? 'bg-cyan-500'
+                          : percentage > 0
+                            ? 'bg-amber-500'
+                            : 'bg-red-500'
                     }`}
                     style={{ width: `${Math.min(percentage, 100)}%` }}
                   />

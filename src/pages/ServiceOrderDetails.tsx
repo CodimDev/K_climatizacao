@@ -1,7 +1,9 @@
 // @ts-nocheck
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { base44 } from '@/api/base44Client'
+import { serviceOrdersDao } from '@/api/dao/serviceOrders'
+import { stockDao } from '@/api/dao/stock'
+import { stockMovementsDao } from '@/api/dao/stockMovements'
 import { Link } from 'react-router-dom'
 import { createPageUrl } from '@/utils'
 import { format } from 'date-fns'
@@ -57,7 +59,7 @@ export default function ServiceOrderDetails() {
   const { data: order, isLoading } = useQuery({
     queryKey: ['service-order', orderId],
     queryFn: async () => {
-      const orders = await base44.entities.ServiceOrder.filter({ id: orderId })
+      const orders = await serviceOrdersDao.filter({ id: orderId })
       return orders[0]
     },
     enabled: !!orderId,
@@ -65,11 +67,11 @@ export default function ServiceOrderDetails() {
 
   const { data: stocks = [] } = useQuery({
     queryKey: ['stocks'],
-    queryFn: () => base44.entities.Stock.list(),
+    queryFn: () => stockDao.list(),
   })
 
   const updateMutation = useMutation({
-    mutationFn: (data) => base44.entities.ServiceOrder.update(orderId, data),
+    mutationFn: (data) => serviceOrdersDao.update(orderId, data),
     onSuccess: () => {
       queryClient.invalidateQueries(['service-order', orderId])
     },
@@ -78,10 +80,8 @@ export default function ServiceOrderDetails() {
   const stockMutation = useMutation({
     mutationFn: async ({ stockId, qty, name }) => {
       const stock = stocks.find((s) => s.id === stockId)
-      await base44.entities.Stock.update(stockId, {
-        quantity: stock.quantity - qty,
-      })
-      await base44.entities.StockMovement.create({
+      await stockDao.update(stockId, { quantity: stock.quantity - qty })
+      await stockMovementsDao.create({
         stock_id: stockId,
         material_name: name,
         type: 'saida',

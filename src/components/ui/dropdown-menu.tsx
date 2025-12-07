@@ -23,16 +23,23 @@ export const DropdownMenuTrigger: React.FC<{
   return React.cloneElement(children, { onClick: handleClick })
 }
 
-export const DropdownMenuContent: React.FC<
-  React.HTMLAttributes<HTMLDivElement>
-> = (props) => {
+type DropdownMenuContentProps = React.HTMLAttributes<HTMLDivElement> & {
+  align?: 'start' | 'end'
+}
+
+export const DropdownMenuContent: React.FC<DropdownMenuContentProps> = ({
+  align,
+  ...props
+}) => {
   const { open } = useContext(Ctx)
   if (!open) return null
   return <div {...props} />
 }
 
-export const DropdownMenuItem: React.FC<React.HTMLAttributes<HTMLDivElement>> = (
-  props,
-) => <div role="menuitem" {...props} />
+export const DropdownMenuItem: React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+> = (props) => <div role="menuitem" {...props} />
 
-export const DropdownMenuSeparator: React.FC = () => <div />
+export const DropdownMenuSeparator: React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+> = (props) => <div {...props} />
