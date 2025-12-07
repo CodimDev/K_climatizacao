@@ -3,11 +3,11 @@ import PriorityBadge from '../ui/PriorityBadge'
 import StatusBadge from '../ui/StatusBadge'
 import { ServiceOrder } from '../../types'
 
-type Props = { items: ServiceOrder[] }
+type Props = { items: ServiceOrder[]; title?: string }
 
-export default function TimelineCard({ items }: Props) {
+export default function TimelineCard({ items, title = 'Hoje' }: Props) {
   return (
-    <Card title="Hoje">
+    <Card title={title}>
       <ul className="space-y-3">
         {items.map(it => (
           <li key={it.id} className="flex items-center justify-between">
