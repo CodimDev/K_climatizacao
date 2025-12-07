@@ -1,10 +1,7 @@
 import React from 'react'
-import { TrendingUp, TrendingDown } from 'lucide-react'
+import { TrendingUp, TrendingDown, type LucideProps } from 'lucide-react'
 
-type IconType = React.ComponentType<{
-  className?: string
-  strokeWidth?: number
-}>
+type IconType = React.ComponentType<Omit<LucideProps, 'ref'>>
 
 type Props = {
   title: string
