@@ -135,46 +135,6 @@ export default function Dashboard() {
     }))
   })()
 
-  const kpis = [
-    {
-      label: 'OS de hoje',
-      value: todayOrders.length,
-      icon: <ClipboardList className="w-4 h-4" />,
-      colorClass: 'text-cyan-600',
-    },
-    {
-      label: 'OS semana',
-      value: weeklyOrders.length,
-      icon: <Clock className="w-4 h-4" />,
-      colorClass: 'text-blue-600',
-    },
-    {
-      label: 'Receita mês',
-      value: monthlyIncome,
-      delta: revenueGrowth,
-      icon: <DollarSign className="w-4 h-4" />,
-      colorClass: 'text-emerald-600',
-    },
-    {
-      label: 'Despesas mês',
-      value: monthlyExpense,
-      icon: <DollarSign className="w-4 h-4" />,
-      colorClass: 'text-rose-600',
-    },
-    {
-      label: 'Saldo',
-      value: monthlyBalance,
-      icon: <ArrowUp className="w-4 h-4" />,
-      colorClass: 'text-purple-600',
-    },
-    {
-      label: 'Estoque baixo',
-      value: lowStockItems.length,
-      icon: <Package className="w-4 h-4" />,
-      colorClass: 'text-amber-600',
-    },
-  ]
-
   return (
     <div className="mx-auto max-w-7xl p-4 space-y-4">
       <div className="text-2xl font-semibold">Dashboard</div>
