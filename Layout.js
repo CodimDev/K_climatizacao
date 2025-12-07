@@ -1,54 +1,41 @@
-import React, { useState, useEffect, createContext, useContext } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { createPageUrl } from './utils'
 import { base44 } from '@/api/base44Client'
 
-// Theme Context
-const ThemeContext = createContext({
-  theme: 'dark',
-  setTheme: () => {},
-  toggleTheme: () => {},
-})
+const ThemeContext = createContext({ theme: 'dark', setTheme: () => {} })
 
 export function useTheme() {
   return useContext(ThemeContext)
 }
 
-function ThemeProvider({ children }) {
+export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('theme')
-      if (saved) return saved
-      // Check system preference
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        return 'dark'
-      }
+      return localStorage.getItem('theme') || 'dark'
     }
     return 'dark'
   })
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))
-  }
-
   useEffect(() => {
     const root = document.documentElement
-    // Remove both classes first
-    root.classList.remove('light', 'dark')
-    // Add current theme class
-    root.classList.add(theme)
-    // Update body background for smooth transition
     if (theme === 'dark') {
-      document.body.style.backgroundColor = '#0A0A0A'
+      root.classList.add('dark')
+      root.classList.remove('light')
     } else {
-      document.body.style.backgroundColor = '#F8FAFC'
+      root.classList.remove('dark')
+      root.classList.add('light')
     }
-    // Save to localStorage
     localStorage.setItem('theme', theme)
   }, [theme])
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'dark'
+    setTheme(savedTheme)
+  }, [])
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   )
